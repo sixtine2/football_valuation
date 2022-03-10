@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+import joblib
 
 st.set_page_config(
      page_title="Player Details",
@@ -14,44 +15,95 @@ st.set_page_config(
      menu_items={'About': "Ask us about out project: contact details bla bla bla check our GitHub"}
  )
 
-input_name = 'Lionel Messi' # TO DO
-
-def app():
+def app(input_name):
 
     # url to request
-    url = "https://raw.githubusercontent.com/sixtine2/football_valuation/master/streamlit_jacques/Data/test.csv"
+    url = "https://raw.githubusercontent.com/sixtine2/football_valuation/master/data/final_dataset.csv"
     # pretty print JSON data
-    df = pd.read_csv(url)
-    df.columns = df.iloc[0]
-    dict_player = df.loc[df['Player Name'] == input_name].to_dict(orient='records')[0]
+    df = pd.read_csv(url, sep = ',')
+    dict_player = df.loc[df['pretty_name'] == input_name].to_dict(orient='records')[0]
 
     ###
 
     player_age = dict_player['age']
-    position = 'Attack'
+    position = dict_player['position']
 
     games_played = dict_player['Games']
+    mean_games = np.mean(df['Games'][df['position'] == position])
+    vs_average_games = int(((games_played - mean_games) / mean_games*100))
+
     goals = dict_player['Goals']
+    mean_goals = np.mean(df['Goals'][df['position'] == position])
+    vs_average_goals = int(((goals - mean_goals) / mean_goals*100))
+
     assists = dict_player['Assists']
-    spg = dict_player['SpG']
-    rating = dict_player['Rating']
-    tackles = dict_player['Tackles']
-    interceptions = dict_player['Interceptions']
-    fouls = dict_player['Fouls commited']
-    dribbled = dict_player['Dribbled past']
-    key_passes = dict_player['Key Passes']
-    dribbles = dict_player['Dribbles']
-    fouled = dict_player['Fouled']
+    mean_assists = np.mean(df['Assists'][df['position'] == position])
+    vs_average_assists = int(((assists - mean_assists) / mean_assists*100))
 
-    contract_expires = int(dict_player['club_contract_valid_until']) + 2022
-    market_value = 60_000_000 # TO DO
-    club_name = "Paris Saint Germain" # TO DO
-    country_name = "Argentina" # TO DO
+    if position != 'Goalkeeper' :
+        spg = round(dict_player['SpG'],1)
+        mean_spg = round(np.mean(df['SpG'][df['position'] == position]),1)
+        vs_average_spg = int(((spg - mean_spg) / mean_spg*100))
 
+    rating = round(dict_player['Rating'],1)
+    mean_rating = round(np.mean(df['Rating'][df['position'] == position]),1)
+    vs_average_rating = int(((rating - mean_rating) / mean_rating*100))
 
-    player_face = 'https://cdn.sofifa.net/players/158/023/22_120.png' # TO DO
-    club_logo = 'https://cdn.sofifa.net/teams/73/60.png' # TO DO
-    nation_logo = 'https://cdn.sofifa.net/teams/1369/60.png' # TO DO
+    if position != 'Goalkeeper' :
+        tackles = round(dict_player['Tackles'],1)
+        mean_tackles = round(np.mean(df['Tackles'][df['position'] == position]),1)
+        vs_average_tackles = int(((tackles - mean_tackles) / mean_tackles*100))
+
+    if position != 'Goalkeeper' :
+        interceptions = round(dict_player['Interceptions'],1)
+        mean_interceptions = round(np.mean(df['Interceptions'][df['position'] == position]),1)
+        vs_average_interceptions = int(((interceptions - mean_interceptions) / mean_interceptions*100))
+
+    if position != 'Goalkeeper' :
+        fouls = round(dict_player['Fouls commited'],1)
+        mean_fouls = round(np.mean(df['Fouls commited'][df['position'] == position]),1)
+        vs_average_fouls = int(((fouls - mean_fouls) / mean_fouls*100))
+
+    if position != 'Goalkeeper' :
+        dribbled = round(dict_player['Dribbled past'],1)
+        mean_dribbled = round(np.mean(df['Dribbled past'][df['position'] == position]),1)
+        vs_average_dribbled = int(((dribbled - mean_dribbled) / mean_dribbled*100))
+
+    if position != 'Goalkeeper' :
+        key_passes = round(dict_player['Key Passes'],1)
+        mean_key_passes = round(np.mean(df['Key Passes'][df['position'] == position]),1)
+        vs_average_key_passes = int(((key_passes - mean_key_passes) / mean_key_passes*100))
+
+    if position != 'Goalkeeper' :
+        dribbles = round(dict_player['Dribbles'],1)
+        mean_dribbles = round(np.mean(df['Dribbles'][df['position'] == position]),1)
+        vs_average_dribbles = int(((dribbles - mean_dribbles) / mean_dribbles*100))
+
+    fouled = round(dict_player['Fouled'],1)
+    mean_fouled = round(np.mean(df['Fouled'][df['position'] == position]),1)
+    vs_average_fouled = int(((fouled - mean_fouled) / mean_fouled*100))
+
+    aearials_won = round(dict_player['Aearials Won'],1)
+    mean_aearials_won = round(np.mean(df['Aearials Won'][df['position'] == position]),1)
+    vs_average_aearials_won = int(((aearials_won - mean_aearials_won) / mean_aearials_won*100))
+
+    clearances = round(dict_player['Clearances'],1)
+    mean_clearances = round(np.mean(df['Clearances'][df['position'] == position]),1)
+    vs_average_clearances = int(((clearances - mean_clearances) / mean_clearances*100))
+
+    contract_expires = int(dict_player['club_contract_valid_until'])
+    club_name = dict_player['club_name']
+
+    market_value = dict_player['market_value_in_eur']
+    mean_value = np.mean(df['market_value_in_eur'])
+    vs_average_value = int(((market_value - mean_value) / mean_value*100))
+
+    our_value = dict_player['prediction']
+    error = round(dict_player['error']*100,1)
+
+    player_face = dict_player['player_face_url']
+    club_logo = dict_player['club_logo_url']
+
 
     #st.set_page_config(layout="wide")
     st.markdown("<h1 style='text-align: center; color: #0f4581;'>{}</h1>".format(input_name), unsafe_allow_html=True)
@@ -64,14 +116,16 @@ def app():
     with col3:
         st.write("")
 
-    col1, col2, col3, col4 = st.columns([6, 1, 5, 5])
+    col1, col2, col3, col4, col5 = st.columns([5, 1, 4, 1, 5])
     with col1:
         st.write("")
     with col2:
         st.image(club_logo)
     with col3:
-        st.markdown("<p style='text-align: left; color: #002448;'>{}</p>".format(club_name), unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #002448;'>{}</p>".format(club_name), unsafe_allow_html=True)
     with col4:
+        st.image(club_logo)
+    with col5:
         st.write("")
 
 
@@ -79,90 +133,214 @@ def app():
     #st.image(club_logo)
     #st.markdown("<img src='https://cdn.sofifa.net/players/158/023/22_120.png'")
 
-    st.subheader('Key info:')
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns([7,3,6,6])
     col1.metric("Position: ", str(position))
     col2.metric("Age: ", str(player_age))
-    col3.metric("Contract expires in: ", str(contract_expires))
-    col4.metric("Market value: ", "€" + str(market_value/1_000_000).format('{:,.0f}') + "M", '+5% vs. average') # TO DO
+    col3.metric("TranserMarkt Value: ", "€" + str(round(market_value/1_000_000,1)).format('{:,.0f}') + "M", f'{vs_average_value}% vs. average')
+    col4.metric("Our value: ", "€" + str(round(our_value/1_000_000,1)).format('{:,.0f}') + "M", f'{error}% vs. TMV') # TO DO
 
+    st.markdown("""<hr style="height:1px;border:none;color:#333;background-color:#333;" /> """, unsafe_allow_html=True)
 
     st.subheader('Recent performance snapshot (2019-2022):')
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown("🏟️ " + str(games_played) + " Matches")
-    with col2:
-        st.markdown("⚽ " + str(goals) + " Total Goals")
-    with col3:
-        st.markdown("🎯 " + str(assists) + " Assists per Game")
-    with col4:
-        st.markdown("🏅 " + str(rating) + " Average Rating")
+    st.markdown(""" *The percentages of evolution are calculated in relation to the average of players playing the same position.*
+                """)
+    st.markdown("<h5 style='text-align: center; border:1px;'>Total statistics</h5>", unsafe_allow_html=True)
+
+    if position != 'Goalkeeper' :
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("🏟️ Games", int(games_played), f'{vs_average_games}%')
+        col2.metric("⚽ Goals", int(goals), f'{vs_average_goals}%')
+        col3.metric("🎯 Assists", int(assists), f'{vs_average_assists}%')
+        col4.metric("🏅 Average Rating", rating, f'{vs_average_rating}%')
+    else :
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("🏟️ Games", int(games_played), f'{vs_average_games}%')
+        col2.metric("🪁 Aearials Won p.G.", aearials_won, f'{vs_average_aearials_won}%')
+        col3.metric("🎯 Clearances p.G.", clearances, f'{vs_average_clearances}%')
+        col4.metric("🏅 Average Rating", rating, f'{vs_average_rating}%')
 
 
     if position == 'Attack':
+        st.markdown("<h5 style='text-align: center; border:1px;'>Statistics per Game</h5>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.markdown("👟 " + str(spg) + " Shots per Game")
-        with col2:
-            st.markdown("🔁 " + str(key_passes) + " Key Passes")
-        with col3:
-            st.markdown("🏃🏽 " + str(dribbles) + " Dribbles")
-        with col4:
-            st.markdown("🤹‍♂️ " + str(fouled) + " Fouled")
+        col1.metric("👟 Shots", spg, f'{vs_average_spg}%')
+        col2.metric("🔁 Key Passes", key_passes, f'{vs_average_key_passes}%')
+        col3.metric("🏃🏽 Dribbles", dribbles, f'{vs_average_dribbles}%')
+        col4.metric("🤹‍♂️ Fouled", fouled, f'{vs_average_fouled}%')
 
     elif position == 'Midfield':
+        st.markdown("<h5 style='text-align: center; border:1px;'>Statistics per Game</h5>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.markdown("👟 " + str(spg) + " Shots per Game")
-        with col2:
-            st.markdown("🔁 " + str(key_passes) + " Key Passes")
-        with col3:
-            st.markdown("🏃🏽 " + str(dribbles) + " Dribbles")
-        with col4:
-            st.markdown("🤹‍♂️ " + str(fouled) + " Fouled")
+        col1.metric("👟 Shots", spg, f'{vs_average_spg}%')
+        col2.metric("🔁 Key Passes", key_passes, f'{vs_average_key_passes}%')
+        col3.metric("🏃🏽 Dribbles", dribbles, f'{vs_average_dribbles}%')
+        col4.metric("🤹‍♂️ Fouled", fouled, f'{vs_average_fouled}%')
 
     elif position == 'Defender':
+        st.markdown("<h5 style='text-align: center; border:1px;'>Statistics per Game</h5>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.markdown("✋ " + str(interceptions) + " Interceptions")
-        with col2:
-            st.markdown("🤹‍♂️ " + str(fouls) + " Fouls committed")
-        with col3:
-            st.markdown("🏃🏽 " + str(dribbled) + " Dribbled past")
-        with col4:
-            st.markdown("🥋 " + str(tackles) + " Tackles")
+        col1.metric("✋ Interceptions", interceptions, f'{vs_average_interceptions}%')
+        col2.metric("🤹‍♂️ Fouls committed", fouls, f'{vs_average_fouls}%')
+        col3.metric("🏃🏽 Dribbled past", dribbled, f'{vs_average_dribbled}%')
+        col4.metric("🥋 Tackles", tackles, f'{vs_average_tackles}%')
+
 
     else:
         pass
 
-    expander = st.expander('Click here to see more stats! 👉')
-    expander.markdown('will show the row of the df for the player') # TO DO
-    #expander.dataframe(df)
 
-    st.subheader('Market value bridge:')
+    st.markdown("""<hr style="height:1px;border:none;color:#333;background-color:#333;" /> """, unsafe_allow_html=True)
+
+    st.subheader('Similar players:')
+
+    model = joblib.load('streamlit/knn_2.pkl')
+    scaler = joblib.load('streamlit/scaler.pkl')
+
+    df_players = pd.read_csv('https://raw.githubusercontent.com/sixtine2/football_valuation/master/streamlit/players.csv', index_col=0, sep=';')
+
+    list_players = df_players['pretty_name']
+    list_players = pd.concat([pd.Series(['']), list_players])
+
+    if input_name:
+
+        idx = df_players[df_players['pretty_name'] == input_name].index[0]
+
+        df_player_selected = df_players.iloc[idx:idx+1]
+
+        df_player_selected = df_player_selected.drop(columns=['position', 'pretty_name', 'player_id',
+		'Minutes played', 'MotM', 'Games', 'Rating', 'club_contract_valid_until',
+		'release_clause_eur', 'market_value_in_eur', 'missed_games', 'wiki_views', 'insta_followers',
+		'age', 'height_cm', 'club_name', 'weight_kg', 'foot', 'Nationality', 'Yellow cards', 'Red cards',
+		'Play_in_CL', 'player_face_url','club_logo_url', 'club_flag_url', 'nation_logo_url', 'nation_flag_url',
+		'player_positions', 'overall', 'potential', 'wage_eur'])
+
+        df_player_selected = scaler.transform(df_player_selected)
+
+        neighbors = model.kneighbors(df_player_selected, n_neighbors=4)
+
+        col_player1, col_player2, col_player3 = st.columns(3)
+        with col_player1:
+            st.image(df_players.iloc[neighbors[1][0][1]]['player_face_url'], width=200)
+            st.markdown("<p style='text-align: center; color: #002448;'><b><font size='+4'>{}</font></b></p>".format(df_players.iloc[neighbors[1][0][1]]['pretty_name']), unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: #002448;'><font size='+3.5'>{}</font></p>".format(df_players.iloc[neighbors[1][0][1]]['club_name']), unsafe_allow_html=True)
+        with col_player2:
+            st.image(df_players.iloc[neighbors[1][0][2]]['player_face_url'], width=200)
+            st.markdown("<p style='text-align: center; color: #002448;'><b><font size='+4'>{}</font></b></p>".format(df_players.iloc[neighbors[1][0][2]]['pretty_name']), unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: #002448;'><font size='+3.5'>{}</font></p>".format(df_players.iloc[neighbors[1][0][2]]['club_name']), unsafe_allow_html=True)
+        with col_player3:
+            st.image(df_players.iloc[neighbors[1][0][3]]['player_face_url'], width=200)
+            st.markdown("<p style='text-align: center; color: #002448;'><b><font size='+4'>{}</font></b></p>".format(df_players.iloc[neighbors[1][0][3]]['pretty_name']), unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: #002448;'><font size='+3.5'>{}</font></p>".format(df_players.iloc[neighbors[1][0][3]]['club_name']), unsafe_allow_html=True)
+
+        col_comparison1,col_comparison2,col_comparison3, col_comparison4, col_comparison5, col_comparison6  = st.columns(6)
+        with col_comparison1:
+            st.markdown('Age: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['age']) + '**')
+            st.markdown('Value: ' + '**€' + str(df_players.iloc[neighbors[1][0][1]]['market_value_in_eur'] + 'M**'))
+
+        with col_comparison2:
+            st.markdown('Rating: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Rating']) + '**')
+            st.markdown('Wage: ' + '**€' + str(df_players.iloc[neighbors[1][0][1]]['wage_eur']+ 'K**'))
+        with col_comparison3:
+            st.markdown('Age: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['age']) + '**')
+            st.markdown('Value: ' + '**€' + str(df_players.iloc[neighbors[1][0][2]]['market_value_in_eur'] + 'M**'))
+        with col_comparison4:
+            st.markdown('Rating: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Rating']) + '**')
+            st.markdown('Wage: ' + '**€' + str(df_players.iloc[neighbors[1][0][2]]['wage_eur']+ 'K**'))
+        with col_comparison5:
+            st.markdown('Age: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['age']) + '**')
+            st.markdown('Value: ' + '**€' + str(df_players.iloc[neighbors[1][0][3]]['market_value_in_eur'] + 'M**'))
+        with col_comparison6:
+            st.markdown('Rating: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Rating']) + '**')
+            st.markdown('Wage: ' + '**€' + str(df_players.iloc[neighbors[1][0][3]]['wage_eur']+ 'K**'))
+
+        col_comparison4, col_comparison5, col_comparison6 = st.columns(3)
+        col_comparison4.markdown('Position: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['player_positions']) + '**')
+        col_comparison5.markdown('Position: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['player_positions']) + '**')
+        col_comparison6.markdown('Position: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['player_positions']) + '**')
+
+        if st.checkbox('Show me more'):
+            col_comp1,col_comp2,col_comp3, col_comp4, col_comp5, col_comp6  = st.columns(6)
+            with col_comp1:
+                st.markdown('Height: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['height_cm']) + '**')
+                st.markdown('Games played: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Games']) + '**')
+                st.markdown('Goals: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Goals']) + '**')
+                st.markdown('Pass success: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['PS%']) + '%**')
+                st.markdown('Intercept.: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Interceptions']) + '**')
+                st.markdown('Insta followers: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['insta_followers'] + 'M**'))
+
+            with col_comp2:
+                st.markdown('Weight: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['weight_kg']) + '**')
+                st.markdown('Missed games: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['missed_games']) + '**')
+                st.markdown('Assists: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Assists']) + '**')
+                st.markdown('Key passes: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Key Passes']) + '**')
+                st.markdown('Dribbled: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['Dribbled past']) + '**')
+                st.markdown('Contract term: ' + '**' + str(df_players.iloc[neighbors[1][0][1]]['club_contract_valid_until']) + '**')
+
+            with col_comp3:
+                st.markdown('Height: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['height_cm']) + '**')
+                st.markdown('Games played: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Games']) + '**')
+                st.markdown('Goals: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Goals']) + '**')
+                st.markdown('Pass success: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['PS%']) + '%**')
+                st.markdown('Intercept.: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Interceptions']) + '**')
+                st.markdown('Insta followers: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['insta_followers'] + 'M**'))
+
+            with col_comp4:
+                st.markdown('Weight: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['weight_kg']) + '**')
+                st.markdown('Missed games: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['missed_games']) + '**')
+                st.markdown('Assists: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Assists']) + '**')
+                st.markdown('Key passes: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Key Passes']) + '**')
+                st.markdown('Dribbled: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['Dribbled past']) + '**')
+                st.markdown('Contract term: ' + '**' + str(df_players.iloc[neighbors[1][0][2]]['club_contract_valid_until']) + '**')
+
+            with col_comp5:
+                st.markdown('Height: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['height_cm']) + '**')
+                st.markdown('Games played: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Games']) + '**')
+                st.markdown('Goals: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Goals']) + '**')
+                st.markdown('Pass success: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['PS%']) + '%**')
+                st.markdown('Intercept.: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Interceptions']) + '**')
+                st.markdown('Insta followers: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['insta_followers'] + 'M**'))
+
+            with col_comp6:
+                st.markdown('Weight: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['weight_kg']) + '**')
+                st.markdown('Missed games: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['missed_games']) + '**')
+                st.markdown('Assists: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Assists']) + '**')
+                st.markdown('Key passes: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Key Passes']) + '**')
+                st.markdown('Dribbled: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['Dribbled past']) + '**')
+                st.markdown('Contract term: ' + '**' + str(df_players.iloc[neighbors[1][0][3]]['club_contract_valid_until']) + '**')
+
+    st.markdown("""<hr style="height:1px;border:none;color:#333;background-color:#333;" /> """, unsafe_allow_html=True)
+
+    st.subheader('🚧 Price breakdown 🚧')
+
+    url_w = "https://raw.githubusercontent.com/sixtine2/football_valuation/master/data/Wagon%20-%20Waterfall.csv"
+    df_waterfall = pd.read_csv(url_w)
+    dict_player_w = df_waterfall.loc[df_waterfall['player_name'] == input_name].to_dict(orient='records')[0]
+    game_stats = dict_player_w['game_stats']
+    physical_factors = dict_player_w['physical_factors']
+    contract_terms = dict_player_w['contract_terms']
+    popularity = dict_player_w['popularity']
+    bias = dict_player_w['bias']
+    market_value_tfm = game_stats + physical_factors + contract_terms + popularity + bias
     fig = go.Figure(go.Waterfall(
-        name = "20", orientation = "v",
-        measure = ["relative", "relative", "total", "relative", "total", "relative", "total"],
-        x = ["Sales cut", "Subs revenue", "Total revenue", "Reputational costs", "Profit before IT", "IT costs", "Profit after IT"],
-        textposition = "outside",
-        text = ["1.4M", "1.5M","2.8M", "-1.4M", "1.4M", "-0.5M", "0.9M"],
-        y = [1.4, 1.5, 2.8, -1.4, 1.4, -0.5, -0.5 -0.9],
-        connector = {"line":{"color":"rgb(210, 210, 210)"}}
-    ))
-
+		name = "20", orientation = "v",
+		measure = ["relative", "relative", "relative", "relative", "relative", "total"],
+		x = ["Game Stats", "Physical Factors", "Contract Terms", "Popularity", "Bias", "Market Value (TFM)"],
+		textposition = "outside",
+		text = [str(round(game_stats)) + "M", str(round(physical_factors)) + "M",str(round(contract_terms)) + "M", str(round(popularity)) + "M", str(round(bias)) + "M", str(round(market_value_tfm)) + "M"],
+		y = [game_stats, physical_factors, contract_terms, popularity, bias, market_value_tfm],
+		connector = {"line":{"color":"rgb(210, 210, 210)"}}
+	))
     fig.update_layout(
-            font_family="Helvetica",
-            #title = "Profit calculation",
-            showlegend = False,
-        plot_bgcolor='rgb(255,255,255)'
-    )
+			font_family="Helvetica",
+		#  title = "Market Value Bridge",
+			showlegend = False,
+		plot_bgcolor='rgb(255,255,255)'
+	)
     fig.update_layout(yaxis={'visible': False, 'showticklabels': False})
     fig.update_layout(xaxis={'visible': True, 'showticklabels': True}, xaxis_title=None)
 
     st.plotly_chart(fig)
 
-
-    st.subheader('Similar players:')
 
 if __name__ == "__main__":
      app()

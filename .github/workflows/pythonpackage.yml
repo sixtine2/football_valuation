@@ -51,4 +51,4 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: "chafftistics" # Must be unique in Heroku
         heroku_email: ${{secrets.HEROKU_EMAIL}}
-        procfile: "web: sh setup.sh && streamlit run streamlit_jacques/streamlit/app.py"
+        procfile: "web: sh setup.sh && streamlit run streamlit/app.py"
