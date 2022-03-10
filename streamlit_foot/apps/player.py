@@ -189,7 +189,7 @@ def app(input_name):
     model = joblib.load('streamlit_foot/knn_2.pkl')
     scaler = joblib.load('streamlit_foot/scaler.pkl')
 
-    df_players = pd.read_csv('https://raw.githubusercontent.com/sixtine2/football_valuation/master/streamlit/players.csv', index_col=0, sep=';')
+    df_players = pd.read_csv('https://raw.githubusercontent.com/Ceynnah/football_valuation/master/streamlit_foot/players.csv', index_col=0, sep=';')
 
     list_players = df_players['pretty_name']
     list_players = pd.concat([pd.Series(['']), list_players])
