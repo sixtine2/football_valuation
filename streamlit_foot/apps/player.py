@@ -7,13 +7,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import joblib
 
-st.set_page_config(
-     page_title="Player Details",
-     page_icon=":soccer:",
-     layout="centered",
-     initial_sidebar_state="collapsed",
-     menu_items={'About': "Ask us about out project: contact details bla bla bla check our GitHub"}
- )
 
 def app(input_name):
 
