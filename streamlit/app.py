@@ -10,8 +10,8 @@ def app():
         initial_sidebar_state="auto") # collapsed
 
     # url to request
-    url = "https://raw.githubusercontent.com/sixtine2/football_valuation/master/data/final_data_v1.csv"
-    df = pd.read_csv(url, sep = ';')
+    url = "https://raw.githubusercontent.com/sixtine2/football_valuation/master/data/final_dataset.csv"
+    df = pd.read_csv(url, sep = ',')
     list_players = list(df['pretty_name'])
     list_title = 'Pick a player please'
     list_players.insert(0, list_title)

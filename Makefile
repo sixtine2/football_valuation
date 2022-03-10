@@ -58,8 +58,8 @@ pypi:
 #         HEROKU COMMANDS
 # ----------------------------------
 
-streamlit:
-	-@streamlit streamlit/run app.py
+streamlit_run:
+	-@streamlit run streamlit/app.py
 
 heroku_login:
 	-@heroku login
