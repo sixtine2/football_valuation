@@ -4,8 +4,8 @@ from apps import player
 
 def app():
     st.set_page_config(
-        page_title="Home Page",
-        page_icon="🤝",
+        page_title="Senastistics",
+        page_icon="⚽️",
         layout="centered", # wide
         initial_sidebar_state="auto") # collapsed
 

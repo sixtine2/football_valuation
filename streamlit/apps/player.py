@@ -310,7 +310,7 @@ def app(input_name):
 
     st.markdown("""<hr style="height:1px;border:none;color:#333;background-color:#333;" /> """, unsafe_allow_html=True)
 
-    st.subheader('Market value bridge:')
+    st.subheader('🚧 Price breakdown 🚧')
 
     url_w = "https://raw.githubusercontent.com/sixtine2/football_valuation/master/data/Wagon%20-%20Waterfall.csv"
     df_waterfall = pd.read_csv(url_w)
