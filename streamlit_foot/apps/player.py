@@ -193,8 +193,8 @@ def app(input_name):
 
     st.subheader('Similar players:')
 
-    model = joblib.load('streamlit/knn_2.pkl')
-    scaler = joblib.load('streamlit/scaler.pkl')
+    model = joblib.load('streamlit_foot/knn_2.pkl')
+    scaler = joblib.load('streamlit_foot/scaler.pkl')
 
     df_players = pd.read_csv('https://raw.githubusercontent.com/sixtine2/football_valuation/master/streamlit/players.csv', index_col=0, sep=';')
 
