@@ -1,10 +1,11 @@
 # Data analysis
-- Document here the project: football_valuation
-- Description: Project Description
-- Data Source:
-- Type of analysis:
-
-Please document the project the better you can.
+- Description:
+3 objectives: 
+> Investigating soccer players' market values: beyond skills, what influences a player's price? His popularity, his age, else...?
+> Predicting soccer players' market values: today, market values are determined manually, relying on the wisdom of the crowd. We are trying to adopt a statistic approach to calculate values as close as possible to the industry reference.
+> Identifying the "closest neighbours" to a given player, based on his game stats.
+- Data Source: Transfermarkt, FIFA, WhoScored, Wikipedia, Instagram
+- Models: Linear Regression, Random Forest, KNN
 
 # Startup the project
 
