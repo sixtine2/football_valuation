@@ -14,6 +14,7 @@
 ● **Models:** Linear Regression, Random Forest, KNN
 
 Presentation: https://docs.google.com/presentation/d/1VUfEW7OOYrEHmWXpV4GHnnUZ3H7MlEX7/edit?usp=sharing&ouid=103619197611930729360&rtpof=true&sd=true 
+
 Streamlit: https://share.streamlit.io/ceynnah/football_valuation/streamlit_foot/app.py
 
 # Startup the project
